@@ -132,8 +132,25 @@ def test_transform_consistency(sample_data):
     assert X_train.shape[1] == X_test.shape[1]
 
 
-def test_preprocess_data_function(sample_data):
+def test_preprocess_data_function():
     """Test the preprocess_data function."""
+    # Create larger sample data to avoid stratification issues
+    data = {
+        'PassengerId': list(range(1, 21)),
+        'Survived': [0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1],
+        'Pclass': [3, 1, 3, 1, 3, 2, 1, 3, 2, 1, 3, 1, 2, 3, 1, 2, 1, 3, 2, 1],
+        'Name': [f'Person {i}, {"Mr" if i % 2 == 0 else "Mrs"}. Name' for i in range(1, 21)],
+        'Sex': ['male' if i % 2 == 0 else 'female' for i in range(1, 21)],
+        'Age': [20 + i for i in range(20)],
+        'SibSp': [i % 3 for i in range(20)],
+        'Parch': [i % 2 for i in range(20)],
+        'Ticket': [f'TICKET{i}' for i in range(20)],
+        'Fare': [10 + i * 5 for i in range(20)],
+        'Cabin': [np.nan if i % 3 == 0 else f'C{i}' for i in range(20)],
+        'Embarked': ['S' if i % 3 == 0 else 'C' if i % 3 == 1 else 'Q' for i in range(20)]
+    }
+    sample_data = pd.DataFrame(data)
+    
     result = preprocess_data(sample_data, val_split=0.2, random_state=42)
     
     # Check all expected keys exist
@@ -148,8 +165,25 @@ def test_preprocess_data_function(sample_data):
     assert result['X_train'].shape[1] == result['X_val'].shape[1]
 
 
-def test_no_data_leakage(sample_data):
+def test_no_data_leakage():
     """Test that there's no data leakage from train to test."""
+    # Create larger sample data to avoid stratification issues
+    data = {
+        'PassengerId': list(range(1, 21)),
+        'Survived': [0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1],
+        'Pclass': [3, 1, 3, 1, 3, 2, 1, 3, 2, 1, 3, 1, 2, 3, 1, 2, 1, 3, 2, 1],
+        'Name': [f'Person {i}, {"Mr" if i % 2 == 0 else "Mrs"}. Name' for i in range(1, 21)],
+        'Sex': ['male' if i % 2 == 0 else 'female' for i in range(1, 21)],
+        'Age': [20 + i for i in range(20)],
+        'SibSp': [i % 3 for i in range(20)],
+        'Parch': [i % 2 for i in range(20)],
+        'Ticket': [f'TICKET{i}' for i in range(20)],
+        'Fare': [10 + i * 5 for i in range(20)],
+        'Cabin': [np.nan if i % 3 == 0 else f'C{i}' for i in range(20)],
+        'Embarked': ['S' if i % 3 == 0 else 'C' if i % 3 == 1 else 'Q' for i in range(20)]
+    }
+    sample_data = pd.DataFrame(data)
+    
     result = preprocess_data(sample_data, val_split=0.4, random_state=42)
     
     X_train = result['X_train']
