@@ -52,6 +52,22 @@ def download_titanic_data():
             #Rename columns using mapping (only if they exist)
             df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
             
+            # Convert Pclass values from strings to numbers if needed
+            if 'Pclass' in df.columns:
+                pclass_map = {'First': 1, 'Second': 2, 'Third': 3, 1: 1, 2: 2, 3: 3}
+                df['Pclass'] = df['Pclass'].map(lambda x: pclass_map.get(x, x))
+                df['Pclass'] = df['Pclass'].astype(int)
+            
+            # Convert Sex to standard capitalized format if needed
+            if 'Sex' in df.columns:
+                df['Sex'] = df['Sex'].str.capitalize()
+            
+            # Convert Embarked to single letter code if needed
+            if 'Embarked' in df.columns:
+                embarked_map = {'Southampton': 'S', 'Cherbourg': 'C', 'Queenstown': 'Q', 
+                                'S': 'S', 'C': 'C', 'Q': 'Q'}
+                df['Embarked'] = df['Embarked'].map(lambda x: embarked_map.get(x, x) if pd.notna(x) else x)
+            
             # Keep only the columns needed for Kaggle Titanic compatibility
             # PassengerId will be created as index, Name and Ticket need special handling
             required_cols = ['Survived', 'Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
