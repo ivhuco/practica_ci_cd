@@ -192,11 +192,11 @@ class TitanicPreprocessor:
         Returns:
             X (features), y (target)
         """
+        # Create features first (before filling, as some fills depend on features)
+        df = self.create_features(df)
+        
         # Fill missing values
         df = self.fill_missing_values(df)
-        
-        # Create features
-        df = self.create_features(df)
         
         # Encode categorical
         df = self.encode_categorical(df, fit=True)
@@ -223,11 +223,11 @@ class TitanicPreprocessor:
         Returns:
             X (features), y (target if available)
         """
+        # Create features first (before filling, as some fills depend on features)
+        df = self.create_features(df)
+        
         # Fill missing values
         df = self.fill_missing_values(df)
-        
-        # Create features
-        df = self.create_features(df)
         
         # Encode categorical
         df = self.encode_categorical(df, fit=False)
