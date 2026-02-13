@@ -53,6 +53,7 @@ graph TB
         CI[ci.yml]
         TRAIN_WF[train-model.yml]
         EVAL_WF[evaluate-model.yml]
+        DOCKER_WF[docker-publish.yml]
     end
     
     subgraph "Testing"
@@ -80,6 +81,11 @@ graph TB
     EVAL_WF -.Ejecuta.-> EVAL
     EVAL_WF -.Usa.-> MODELS
     
+    DOCKER_WF -.Build.-> DL
+    DOCKER_WF -.Build.-> LOADER
+    DOCKER_WF -.Build.-> PREP
+    DOCKER_WF -.Publica.-> MODELS
+    
     style DL fill:#e1f5ff
     style LOADER fill:#e1f5ff
     style PREP fill:#fff3e0
@@ -89,6 +95,7 @@ graph TB
     style CI fill:#fce4ec
     style TRAIN_WF fill:#fce4ec
     style EVAL_WF fill:#fce4ec
+    style DOCKER_WF fill:#4A90E2
 ```
 
 ### Flujo del Pipeline de ML
@@ -139,11 +146,12 @@ sequenceDiagram
 ### Flujo de CI/CD
 
 ```mermaid
-graph LR
+graph TB
     subgraph "Trigger Events"
         PUSH[Push/PR a main]
         MANUAL[Trigger Manual]
         SCHEDULE[Cron Semanal]
+        TAG[Push Tag v*]
     end
     
     subgraph "CI Workflow"
@@ -152,6 +160,16 @@ graph LR
         LINT[Linting]
         TEST[Tests + Coverage]
         UPLOAD_COV[Upload Coverage]
+    end
+    
+    subgraph "Docker Workflow 🐳"
+        CHECKOUT_D[Checkout Code]
+        BUILDX[Setup Docker Buildx]
+        LOGIN[Login to GHCR]
+        META[Extract Metadata]
+        BUILD_DEV[Build Development Image]
+        BUILD_PROD[Build Production Image]
+        PUSH_IMG[Push to ghcr.io]
     end
     
     subgraph "Train Workflow"
@@ -171,24 +189,48 @@ graph LR
         COMMENT[Comment on PR]
     end
     
+    %% CI Flow
     PUSH --> CHECKOUT1
     CHECKOUT1 --> SETUP1 --> LINT --> TEST --> UPLOAD_COV
     
+    %% Docker Flow
+    PUSH --> CHECKOUT_D
+    TAG --> CHECKOUT_D
+    CHECKOUT_D --> BUILDX --> LOGIN --> META
+    META --> BUILD_DEV --> PUSH_IMG
+    TAG -.only for tags.-> BUILD_PROD
+    BUILD_PROD --> PUSH_IMG
+    
+    %% Train Flow
     MANUAL --> CHECKOUT2
     SCHEDULE --> CHECKOUT2
     CHECKOUT2 --> SETUP2 --> DOWNLOAD --> TRAIN_EXEC --> SAVE_MODEL
     
+    %% Evaluate Flow
     SAVE_MODEL -.triggers.-> CHECKOUT3
     CHECKOUT3 --> SETUP3 --> LOAD_MODEL --> EVAL_EXEC --> SAVE_RESULTS --> COMMENT
     
     style PUSH fill:#bbdefb
     style MANUAL fill:#c8e6c9
     style SCHEDULE fill:#fff9c4
+    style TAG fill:#f8bbd0
     style LINT fill:#ffccbc
     style TEST fill:#ffccbc
+    style BUILD_DEV fill:#4A90E2
+    style BUILD_PROD fill:#1565C0
+    style PUSH_IMG fill:#4A90E2
     style TRAIN_EXEC fill:#c5e1a5
     style EVAL_EXEC fill:#ce93d8
 ```
+
+### Workflows Activos
+
+| Workflow | Trigger | Duración | Output |
+|----------|---------|----------|--------|
+| **CI - Testing and Linting** | Push/PR a main | ~50s | Test results + coverage |
+| **Docker Build and Publish** | Push a main / Tags | ~1-2min | Docker image en GHCR |
+| **Train Model** | Manual / Semanal | ~37s | Model artifact (.pkl) |
+| **Evaluate Model** | Después de Train | ~44s | Metrics + visualizaciones |
 
 ## Componentes Principales
 
