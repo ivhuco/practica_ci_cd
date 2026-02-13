@@ -138,6 +138,11 @@ Documentación detallada de cada componente:
 - [🔄 CI Workflow](docs/ci-cd/WORKFLOW_CI.md) - Testing y linting automático
 - [🚂 Train Workflow](docs/ci-cd/WORKFLOW_TRAIN.md) - Entrenamiento automático
 - [📈 Evaluate Workflow](docs/ci-cd/WORKFLOW_EVALUATE.md) - Evaluación automática
+- [🐳 Docker Workflow](docs/ci-cd/WORKFLOW_DOCKER.md) - Build y publicación de imágenes Docker
+
+### Documentación de Docker
+
+- [🐳 Docker Guide](docs/DOCKER.md) - Guía completa de Docker (instalación, uso, troubleshooting)
 
 ### Otros
 
