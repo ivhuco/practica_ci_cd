@@ -14,6 +14,8 @@ Proyecto completo de Machine Learning para predecir la supervivencia de pasajero
 
 - [Características](#-características)
 - [Inicio Rápido](#-inicio-rápido)
+  - [Docker 🐳](#opción-1-usando-docker--recomendado)
+  - [Instalación Local](#opción-2-instalación-local)
 - [Documentación](#-documentación)
 - [Estructura del Proyecto](#-estructura-del-proyecto)
 - [Uso Detallado](#-uso-detallado)
@@ -48,16 +50,36 @@ Proyecto completo de Machine Learning para predecir la supervivencia de pasajero
 - ✅ **Entrenamiento programado** (semanal)
 - ✅ **Evaluación automática** después del entrenamiento
 - ✅ **Artifacts** versionados (modelos, métricas, reportes)
+- ✅ **Docker** para deployment reproducible
 
 ## 🚀 Inicio Rápido
 
-### Prerequisitos
+### Opción 1: Usando Docker 🐳 (Recomendado)
+
+```bash
+# Clonar repositorio
+git clone https://github.com/ivhuco/practica_ci_cd.git
+cd practica_ci_cd
+
+# Construir y ejecutar con Docker Compose
+docker-compose up train evaluate
+
+# O usar Docker directamente
+docker build -t titanic-ml:dev .
+docker run -it --rm titanic-ml:dev
+```
+
+Ver [docs/DOCKER.md](docs/DOCKER.md) para documentación completa de Docker.
+
+### Opción 2: Instalación Local
+
+#### Prerequisitos
 
 - Python 3.9 o superior
 - pip
 - Git
 
-### Instalación en 3 Pasos
+#### Instalación en 3 Pasos
 
 ```bash
 # 1. Clonar el repositorio
