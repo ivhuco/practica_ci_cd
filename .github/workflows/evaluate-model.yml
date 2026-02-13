@@ -45,10 +45,13 @@ jobs:
     
     - name: Download trained model
       if: github.event_name == 'workflow_run'
-      uses: actions/download-artifact@v4
+      uses: dawidd6/action-download-artifact@v3
       with:
+        workflow: train-model.yml
+        workflow_conclusion: success
         name: trained-model
         path: .
+        check_artifacts: true
     
     - name: Evaluate model
       run: |
