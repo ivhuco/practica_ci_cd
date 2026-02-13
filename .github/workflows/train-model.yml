@@ -52,7 +52,7 @@ jobs:
         python src/train.py --model $MODEL_TYPE --val-split 0.2 --cv-folds 5
     
     - name: Upload trained model
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: trained-model
         path: |
@@ -61,7 +61,7 @@ jobs:
         retention-days: 30
     
     - name: Upload training metrics
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: training-metrics
         path: reports/training_metrics.json
