@@ -91,8 +91,17 @@ def download_titanic_data():
                 else:
                     df['Cabin'] = pd.NA
             
+            # Select only Kaggle-compatible columns (remove seaborn-specific columns)
+            kaggle_columns = ['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age',
+                             'SibSp', 'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked']
+            
+            # Keep only the columns that exist in our dataframe
+            available_kaggle_cols = [col for col in kaggle_columns if col in df.columns]
+            df = df[available_kaggle_cols]
+            
             df.to_csv(train_path, index=False)
             print(f"✓ Downloaded dataset using seaborn and normalized column names")
+            print(f"  Columns kept: {list(df.columns)}")
         except Exception as e:
             print(f"⚠ Could not download via seaborn: {e}")
             
