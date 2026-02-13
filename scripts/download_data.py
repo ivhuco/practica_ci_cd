@@ -29,8 +29,54 @@ def download_titanic_data():
             print("Attempting to download from seaborn datasets...")
             import seaborn as sns
             df = sns.load_dataset('titanic')
+            
+            # Normalize column names to match Kaggle Titanic format
+            column_mapping = {
+                'survived': 'Survived',
+                'pclass': 'Pclass',
+                'sex': 'Sex',
+                'age': 'Age',
+                'sibsp': 'SibSp',
+                'parch': 'Parch',
+                'fare': 'Fare',
+                'embarked': 'Embarked',
+                'class': 'Pclass',  # seaborn also has 'class' which is duplicate
+                'who': 'Who',
+                'adult_male': 'Adult_male',
+                'deck': 'Deck',
+                'embark_town': 'Embark_town',
+                'alive': 'Alive',
+                'alone': 'Alone'
+            }
+            
+            #Rename columns using mapping (only if they exist)
+            df = df.rename(columns={k: v for k, v in column_mapping.items() if k in df.columns})
+            
+            # Keep only the columns needed for Kaggle Titanic compatibility
+            # PassengerId will be created as index, Name and Ticket need special handling
+            required_cols = ['Survived', 'Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']
+            optional_cols = ['Who', 'Deck', 'Embark_town', 'Alive', 'Alone', 'Adult_male']
+            
+            # Create PassengerId if it doesn't exist
+            if'PassengerId' not in df.columns:
+                df.insert(0, 'PassengerId', range(1, len(df) + 1))
+            
+            # Create dummy Name and Ticket columns if they don't exist
+            if 'Name' not in df.columns:
+                df['Name'] = df.apply(lambda row: f"{row.get('Who', 'Unknown')}, {'Mr' if row.get('Sex') == 'male' else 'Mrs'}. Passenger {row.get('PassengerId', 0)}", axis=1)
+            
+            if 'Ticket' not in df.columns:
+                df['Ticket'] = df['PassengerId'].apply(lambda x: f"TICKET{x:05d}")
+            
+            if 'Cabin' not in df.columns:
+                # Use 'deck' if available, otherwise NaN
+                if 'Deck' in df.columns:
+                    df['Cabin'] = df['Deck'].apply(lambda x: f"{x}01" if pd.notna(x) else pd.NA)
+                else:
+                    df['Cabin'] = pd.NA
+            
             df.to_csv(train_path, index=False)
-            print(f"✓ Downloaded dataset using seaborn")
+            print(f"✓ Downloaded dataset using seaborn and normalized column names")
         except Exception as e:
             print(f"⚠ Could not download via seaborn: {e}")
             
